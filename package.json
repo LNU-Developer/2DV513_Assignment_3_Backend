@@ -1,0 +1,55 @@
+{
+  "name": "2DV513_Assignment_3_Backend",
+  "version": "1.0.0",
+  "description": "Solution for assignment 3",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "eslintConfig": {
+    "extends": "@lnu"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RMarjanovic/2DV513_Assignment_3_Backend.git"
+  },
+  "keywords": [
+    "SQL",
+    "Database",
+    "NodeJS",
+    "Express",
+    "CRUD",
+    "Journal",
+    "Journal System",
+    "LNU",
+    "WP",
+    "UDM"
+  ],
+  "engines": {
+    "node": "12.0.0"
+  },
+  "dependencies": {
+    "dotenv-extended": "^2.9.0",
+    "express": "^4.17.1",
+    "mysql2": "^2.2.5",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "@lnu/eslint-config": "^1.1.0",
+    "eslint": "^7.3.0",
+    "eslint-plugin-import": "^2.21.2",
+    "eslint-plugin-jsdoc": "^27.1.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "nodemon": "^2.0.6"
+  },
+  "author": "Rickard Marjanovic and Dennis Demir",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/RMarjanovic/2DV513_Assignment_3_Backend.git/issues"
+  },
+  "homepage": "https://github.com/RMarjanovic/2DV513_Assignment_3_Backend.git#readme"
+}
