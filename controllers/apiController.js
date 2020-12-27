@@ -47,6 +47,7 @@ apiController.getAllPatients = async (req, res) => {
  */
 apiController.addPatient = async (req, res) => {
   const patient = req.body
+  req.body.CreatedBy = 1
   db.connection.query(
     'INSERT INTO contactdetails (PhoneNo, Adress, PostalNo, City, Email) VALUES (?,?,?,?,?)',
     [
@@ -72,12 +73,10 @@ apiController.addPatient = async (req, res) => {
           false
         ],
         function (error, results, fields) {
-          if (error) {
-            console.log(error)
-          }
+          if (error) return res.json({ error: error })
+          else { res.status(200).send('OK') }
         }
       )
-      res.status(200).send('OK')
     })
 }
 

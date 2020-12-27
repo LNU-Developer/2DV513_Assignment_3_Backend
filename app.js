@@ -6,6 +6,23 @@ const express = require("express");
 const app = express();
 app.use(express.json()); // Used to parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
+const path = require("path");
+require("dotenv").config({ path: path.join(__dirname) + "/.env" });
+const logger = require("morgan");
+const express = require("express");
+const cors = require("cors");
+const app = express();
+
+app.use(logger("dev"));
+
+const corsOptions = {
+  origin: "http://localhost:3000",
+  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+
+app.use(cors(corsOptions));
+app.use(express.json()); // Used to parse JSON bodies
+app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 
 // Routes
 app.use("/", require("./routes/apiRouter"));
