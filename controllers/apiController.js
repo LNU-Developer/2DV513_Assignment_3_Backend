@@ -33,7 +33,7 @@ apiController.getPatient = async (req, res) => {
  */
 apiController.getAllPatients = async (req, res) => {
   db.connection.query(
-    'SELECT * FROM patient',
+    'SELECT * FROM patient WHERE IsDeleted = 0',
     (error, results) => {
       if (error) return res.json({ error: error })
       res.status(200).send(results)
@@ -130,22 +130,17 @@ apiController.editPatient = async (req, res) => {
  * @param {object} res - result object
  */
 apiController.deletePatient = async (req, res) => {
-  const ssn = req.body.SocialSecurityNumber
+  const ssn = req.params.ssn
 
   db.connection.query(
-    'SELECT * FROM patient WHERE SocialSecurityNumber = ?', ssn,
-    (error, results) => {
-      if (error) return res.json({ error: error })
-      db.connection.query(
-            `UPDATE patient WHERE PatientId = ${results.PatientId} (IsDeleted) VALUES (?)`,
-            [
-              true
-            ],
-            function (error, results, fields) {
-              if (error) console.log(error)
-              res.status(200).send('OK')
-            }
-      )
+    'UPDATE patient SET IsDeleted = ? WHERE `SocialSecurityNumber` = ?',
+    [
+      true,
+      ssn
+    ],
+    function (error, results, fields) {
+      if (error) console.log(error)
+      res.status(200).send('OK')
     }
   )
 }
