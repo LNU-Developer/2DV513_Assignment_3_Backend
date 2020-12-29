@@ -36,7 +36,7 @@ apiController.getAllPatients = async (req, res) => {
     'SELECT patient.*, contactdetails.* FROM patient JOIN contactdetails ON patient.ContactDetailId = contactdetails.ContactDetailId WHERE IsDeleted = 0',
     (error, results) => {
       if (error) return res.json({ error: error })
-      res.status(200).send(results)
+      else res.status(200).send(results)
     })
 }
 
@@ -59,24 +59,26 @@ apiController.addPatient = async (req, res) => {
     ],
     (error, results) => {
       if (error) return res.json({ error: error })
-      db.connection.query(
-        'INSERT INTO patient (FirstName, LastName, SocialSecurityNumber, IdentificationType, CreatedDate, CreatedBy, ContactDetailId, IsDeleted) VALUES (?,?,?,?,?,?,?,?,?)',
-        [
-          patient.FirstName,
-          patient.LastName,
-          patient.SocialSecurityNumber,
-          patient.IdentificationType,
-          new Date(),
-          patient.CreatedBy,
-          results.insertId,
-          false
-        ],
-        function (error, results, fields) {
-          if (error) return res.json({ error: error })
-        }
-      )
+      else {
+        db.connection.query(
+          'INSERT INTO patient (FirstName, LastName, SocialSecurityNumber, IdentificationType, CreatedDate, CreatedBy, ContactDetailId, IsDeleted) VALUES (?,?,?,?,?,?,?,?)',
+          [
+            patient.FirstName,
+            patient.LastName,
+            patient.SocialSecurityNumber,
+            patient.IdentificationType,
+            new Date(),
+            patient.CreatedBy,
+            results.insertId,
+            false
+          ],
+          function (error, results, fields) {
+            if (error) return res.json({ error: error })
+            else res.status(200).send('OK')
+          }
+        )
+      }
     })
-  res.status(200).send('OK')
 }
 
 /** Edit patient.
@@ -85,12 +87,11 @@ apiController.addPatient = async (req, res) => {
  * @param {object} res - result object
  */
 apiController.editPatient = async (req, res) => {
-  const ssn = req.body.SocialSecurityNumber
+  const patientId = req.body.PatientId
   const patient = req.body
   db.connection.query(
-    'SELECT * FROM patient WHERE SocialSecurityNumber = ?', ssn,
+    'SELECT * FROM patient WHERE PatientId = ?', patientId,
     (error, results) => {
-      const patientId = results[0].PatientId
       const contactDetailId = results[0].ContactDetailId
       if (error) return res.json({ error: error })
       db.connection.query(
@@ -104,20 +105,22 @@ apiController.editPatient = async (req, res) => {
         ],
         (error, results) => {
           if (error) return res.json({ error: error })
-        })
-      db.connection.query(
-          `UPDATE patient SET FirstName = ?, LastName = ?, SocialSecurityNumber = ?, IdentificationType = ? WHERE PatientId = ${patientId}`,
-          [
-            patient.FirstName,
-            patient.LastName,
-            patient.SocialSecurityNumber,
-            patient.IdentificationType
-          ],
-          function (error, results) {
-            if (error) return res.json({ error: error })
+          else {
+            db.connection.query(
+              `UPDATE patient SET FirstName = ?, LastName = ?, SocialSecurityNumber = ?, IdentificationType = ? WHERE PatientId = ${patientId}`,
+              [
+                patient.FirstName,
+                patient.LastName,
+                patient.SocialSecurityNumber,
+                patient.IdentificationType
+              ],
+              function (error, results) {
+                if (error) return res.json({ error: error })
+                else res.status(200).send('OK')
+              }
+            )
           }
-      )
-      res.status(200).send('OK')
+        })
     })
 }
 
