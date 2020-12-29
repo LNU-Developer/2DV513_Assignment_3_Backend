@@ -33,7 +33,7 @@ apiController.getPatient = async (req, res) => {
  */
 apiController.getAllPatients = async (req, res) => {
   db.connection.query(
-    'SELECT * FROM patient WHERE IsDeleted = 0',
+    'SELECT patient.*, contactdetails.* FROM patient JOIN contactdetails ON patient.ContactDetailId = contactdetails.ContactDetailId WHERE IsDeleted = 0',
     (error, results) => {
       if (error) return res.json({ error: error })
       res.status(200).send(results)
@@ -60,12 +60,11 @@ apiController.addPatient = async (req, res) => {
     (error, results) => {
       if (error) return res.json({ error: error })
       db.connection.query(
-        'INSERT INTO patient (FirstName, LastName, SocialSecurityNumber, ProofOfIdentification, IdentificationType, CreatedDate, CreatedBy, ContactDetailId, IsDeleted) VALUES (?,?,?,?,?,?,?,?,?)',
+        'INSERT INTO patient (FirstName, LastName, SocialSecurityNumber, IdentificationType, CreatedDate, CreatedBy, ContactDetailId, IsDeleted) VALUES (?,?,?,?,?,?,?,?,?)',
         [
           patient.FirstName,
           patient.LastName,
           patient.SocialSecurityNumber,
-          patient.ProofOfIdentification,
           patient.IdentificationType,
           new Date(),
           patient.CreatedBy,
@@ -74,10 +73,10 @@ apiController.addPatient = async (req, res) => {
         ],
         function (error, results, fields) {
           if (error) return res.json({ error: error })
-          else { res.status(200).send('OK') }
         }
       )
     })
+  res.status(200).send('OK')
 }
 
 /** Edit patient.
@@ -86,15 +85,16 @@ apiController.addPatient = async (req, res) => {
  * @param {object} res - result object
  */
 apiController.editPatient = async (req, res) => {
-  const ssn = req.body.ssn
+  const ssn = req.body.SocialSecurityNumber
   const patient = req.body
-
   db.connection.query(
     'SELECT * FROM patient WHERE SocialSecurityNumber = ?', ssn,
     (error, results) => {
+      const patientId = results[0].PatientId
+      const contactDetailId = results[0].ContactDetailId
       if (error) return res.json({ error: error })
       db.connection.query(
-        `UPDATE contactdetails WHERE ContactDetailId = ${results.ContactDetailId} (PhoneNo, Adress, PostalNo, City, Email) VALUES (?,?,?,?,?)`,
+        `UPDATE contactdetails SET PhoneNo = ?, Adress = ?, PostalNo = ?, City = ?, Email = ? WHERE ContactDetailId = ${contactDetailId}`,
         [
           patient.PhoneNo,
           patient.Adress,
@@ -104,23 +104,20 @@ apiController.editPatient = async (req, res) => {
         ],
         (error, results) => {
           if (error) return res.json({ error: error })
-          db.connection.query(
-            `UPDATE patient WHERE PatientId = ${results.PatientId} (FirstName, LastName, SocialSecurityNumber, ProofOfIdentification, IdentificationType) VALUES (?,?,?,?,?)`,
-            [
-              patient.FirstName,
-              patient.LastName,
-              patient.SocialSecurityNumber,
-              patient.ProofOfIdentification,
-              patient.IdentificationType
-            ],
-            function (error, results, fields) {
-              if (error) {
-                console.log(error)
-              }
-            }
-          )
-          res.status(200).send('OK')
         })
+      db.connection.query(
+          `UPDATE patient SET FirstName = ?, LastName = ?, SocialSecurityNumber = ?, IdentificationType = ? WHERE PatientId = ${patientId}`,
+          [
+            patient.FirstName,
+            patient.LastName,
+            patient.SocialSecurityNumber,
+            patient.IdentificationType
+          ],
+          function (error, results) {
+            if (error) return res.json({ error: error })
+          }
+      )
+      res.status(200).send('OK')
     })
 }
 
@@ -139,10 +136,10 @@ apiController.deletePatient = async (req, res) => {
       ssn
     ],
     function (error, results, fields) {
-      if (error) console.log(error)
-      res.status(200).send('OK')
+      if (error) return res.json({ error: error })
     }
   )
+  res.status(200).send('OK')
 }
 
 module.exports = apiController
