@@ -65,7 +65,7 @@ apiController.getPatientFemale = async (req, res) => {
  */
 apiController.getAllPatients = async (req, res) => {
   db.connection.query(
-    'SELECT user.*, contactdetails.* FROM user JOIN contactdetails ON patient.ContactDetailId = contactdetails.ContactDetailId WHERE IsDeleted = 0',
+    'SELECT user.*, contactdetails.* FROM user JOIN contactdetails ON user.ContactDetailId = contactdetails.ContactDetailId WHERE IsDeleted = 0',
     (error, results) => {
       if (error) return res.json({ error: error })
       else res.status(200).send(results)
@@ -154,11 +154,11 @@ apiController.addPatient = async (req, res) => {
  * @param {object} res - result object
  */
 apiController.editPatient = async (req, res) => {
-  const patientId = req.body.PatientId
+  const userId = req.body.UserId
   const patient = req.body
   db.connection.query(
     'SELECT * FROM user WHERE UserId = ?',
-    patientId,
+    userId,
     (error, results) => {
       const contactDetailId = results[0].ContactDetailId
       if (error) return res.json({ error: error })
@@ -175,7 +175,7 @@ apiController.editPatient = async (req, res) => {
                   if (error) return res.json({ error: error })
                   else {
                     db.connection.query(
-                            `UPDATE user SET FirstName = ?, LastName = ?, SocialSecurityNumber = ?, IdentificationType = ? WHERE PatientId = ${patientId}`,
+                            `UPDATE user SET FirstName = ?, LastName = ?, SocialSecurityNumber = ?, IdentificationType = ? WHERE UserId = ${userId}`,
                             [
                               patient.FirstName,
                               patient.LastName,
